@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>數位身分證感應頁面</title>
+    <style>
+      /*背景*/
+      body{
+        background-color: #DCDCDC;
+        margin: 0; /* 移除body的默認margin */
+        padding: 0; /* 移除body的默認padding */
+      }
+      .card {
+        --corner-granularity: 3; /* The number of faces used to simulate a round corner. More faces means more smooth. */
+        --border-radius: 1rem; /* exaggerated */
+        border-radius: var(--border-radius);
+      }
+      
+      .corner > * {
+        background-color: #cdcdcd; /* Red is just to highlight the corners */
+      }
+      
+      /* We have to override the edges so they do not overlap the corners */
+      .right, .left {
+        inset-block: var(--border-radius);
+        height: calc(100% - 2 * var(--border-radius));
+      } .top, .bottom {
+        inset-inline: var(--border-radius);
+        width: calc(100% - 2 * var(--border-radius));
+      }
+      
+      .corner {
+        --n: var(--corner-granularity);
+        --r: var(--border-radius);
+        
+        position: absolute;
+        transform-style: preserve-3d;
+      }
+      
+      /* A corner is composed of a finite number of flat faces that, when arranged in just the right way, looks rounded. We need to do it this way because curved 3D surfaces do not exist in CSS. */
+      .corner > * {
+        position: absolute;
+        inset-block-end: 0;
+        width: var(--card-depth);
+        height: calc(2 * var(--r) * sin(45deg / var(--n)));
+        transform-origin: bottom center;
+        
+        /* This math constructs a single corner. I derived it on a paper somewhere and threw it away, so you'll have to derive it yourself if you want to understand what's happening (: */
+        transform:
+          translateZ(calc(var(--r) * cos(var(--i) * 90deg / var(--n))))
+          translateY(calc(-1 * var(--r) * sin(var(--i) * 90deg / var(--n))))
+          rotateX(calc(45deg * (2 * var(--i) + 1) / var(--n)));
+      }
+      
+      /* The rest of this code slots the corners where they belong. */
+      .top-right {
+        inset-block-start: 0;
+        inset-inline-end: 0;
+      
+        transform:
+          rotateY(90deg)
+          translateZ(calc(-1 * var(--r)))
+          translateY(var(--r));
+      } 
+      .bottom-right {
+        inset-block-end: 0;
+        inset-inline-end: 0;
+      
+        transform:
+          rotateY(90deg)
+          rotateX(270deg)
+          translateZ(calc(-1 * var(--r)))
+          translateY(var(--r));
+      } 
+      .bottom-left {
+        inset-block-end: 0;
+        inset-inline-start: 0;
+      
+        transform:
+          rotateY(90deg)
+          rotateX(180deg)
+          translateZ(calc(-1 * var(--r)))
+          translateY(var(--r));
+      } 
+      .top-left {
+        inset-block-start: 0;
+        inset-inline-start: 0;
+      
+        transform:
+          rotateY(90deg)
+          rotateX(90deg)
+          translateZ(calc(-1 * var(--r)))
+          translateY(var(--r));
+      }
+      
+      /* ******************************************
+       * END LEVEL 3 CODE
+       * ******************************************/
+      
+      /**
+       * Card Thickness CSS (see: https://codepen.io/auroratide/pen/KKEEqzG)
+       */
+      .card {
+        /*卡片厚度*/
+         --card-depth: 0.3rem;
+      }
+      
+      .card .back {
+         transform: translateZ(calc(-1 * var(--card-depth))) rotateY(180deg);
+      }
+      
+      .edge {
+        /*四個邊邊*/
+        background-color: #dfdfdf;
+        position: absolute;
+      }
+      
+      .right, .left {
+         width: var(--card-depth);
+      } 
+      .right {
+         inset-inline-end: 0;
+         transform: rotateY(270deg);
+         transform-origin: right center;
+      } 
+      .left {
+         inset-inline-start: 0;
+         transform: rotateY(90deg);
+         transform-origin: left center;
+      }
+      
+      .top, .bottom {
+         height: var(--card-depth);
+      } 
+      .top {
+         inset-block-start: 0;
+         transform: rotateX(270deg);
+         transform-origin: center top;
+      } 
+      .bottom {
+         inset-block-end: 0;
+         transform: rotateX(90deg);
+         transform-origin: center bottom;
+      }
+      
+      /**
+       * Verticality CSS (see: https://codepen.io/auroratide/pen/xxBBdmo)
+       */
+      @keyframes flip-to-front {
+        0% { transform: translateZ(calc(-1 * var(--card-depth))) rotateY(-180deg); }
+        50% { transform: rotateY(-270deg); }
+        100% { transform: translateZ(0em) rotateY(-360deg); }
+      }
+      
+      @keyframes flip-to-back {
+        0% { transform: translateZ(0em) rotateY(0deg); }
+        50% { transform: rotateY(-90deg); }
+        100% { transform: translateZ(calc(-1 * var(--card-depth))) rotateY(-180deg); }
+      }
+      @keyframes shadow-to-front {
+        0% { opacity: 1 ; filter: blur(12px);}
+        50% { opacity: 0.1 ; filter: blur(100px);}
+        100% { opacity: 1 ; filter: blur(12px);}
+      }
+      
+      @keyframes shadow-to-back {
+        0% { opacity: 1 ; filter: blur(12px);}
+        50% { opacity: 0.1 ; filter: blur(100px);}
+        100% { opacity: 1 ; filter: blur(12px);}
+      }/*
+      @keyframes shadow-to-front {
+        0% { transform:  rotateY(-180deg); }
+        50% { transform: rotateY(-270deg) skew(0deg, 40deg);}
+        100% { transform:rotateY(-360deg); }
+      }
+      
+      @keyframes shadow-to-back {
+        0% { transform:  rotateY(0deg); }
+        50% { transform: rotateY(-90deg) skew(0deg, 40deg); }
+        100% { transform: rotateY(-180deg); }
+      }*/
+      .card-animation {
+        animation-duration: 3s;
+        animation-fill-mode: both;
+        animation-timing-function: linear;
+      }
+      
+      /**
+       * BASE CARD CSS
+       */
+
+      .card-size {
+        width: 100%;
+        max-width: 30rem;
+        min-width: 22rem;
+        aspect-ratio: 8.5 / 5.5;
+        position: relative;
+        transform-style: preserve-3d;
+        
+      }
+      .card section {
+        width: 100%;
+        height: 100%;
+        border-radius: inherit;
+      }
+
+      
+      .card .back {
+        position: absolute;
+        inset: 0;
+      }
+      
+      .perspective-container {
+        perspective: 100rem;
+        perspective-origin: center;
+      }
+      
+      /**
+       * Base demo css. Not important for the demo; just to look pretty.
+       */
+      :root {
+        --blue: oklch(51% 0.129 259);
+        --white: oklch(100% 0 0);
+        --yellow: oklch(86% 0.18 89);
+        --grey: oklch(32% 0 0);
+        --electric: oklch(66% 0.137 91);
+      }
+      
+      *, *::before, *::after { box-sizing: border-box; }
+    
+      
+      .card p { margin: 0; }
+      
+      /*兩面卡面*/
+      .card section {
+        border: 0.5rem solid #FEFEFE;
+        /*box-shadow: 0 0 0.15em 0.1em oklch(0% 0 0 / 0.75) inset;*/
+        background: #FEFEFE;
+      }
+      
+      .back dl {
+        display: grid;
+        grid-template-columns: 5.5ch 4ch 1fr;
+      }
+      
+      .back dt { font-weight: bold; }
+      .back dt + dd { text-align: end; }
+      .back dd { margin: 0; }
+      .back dd + dd { padding-inline: 0.5rem; }
+      .back [role="meter"] {
+        height: 90%;
+        width: calc(100% * (var(--value) / 255));
+        border: 0.0625rem solid;
+      }
+      
+      .back footer {
+        font-size: 0.875rem;
+        line-height: 1.25;
+      }
+      
+      [role="meter"].hp {
+        background-color: oklch(63% 0.258 29);
+        border-color: oklch(46% 0.187 29);
+      }
+      [role="meter"].atk {
+        background-color: oklch(71% 0.163 52);
+        border-color: oklch(46% 0.187 29);
+      }
+      [role="meter"].def {
+        background-color: oklch(87% 0.167 94);
+        border-color: oklch(63% 0.119 94);
+      }
+      [role="meter"].spatk {
+        background-color: oklch(67% 0.15 265);
+        border-color: oklch(49% 0.105 266);
+      }
+      [role="meter"].spdef {
+        background-color: oklch(76% 0.174 137);
+        border-color: oklch(55% 0.123 137);
+      }
+      [role="meter"].spd {
+        background-color: oklch(69% 0.198 6);
+        border-color: oklch(50% 0.14 5);
+      }
+      
+      .flip-demo {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      /*卡片離按鈕的距離*/
+      .card { 
+        margin-block-end: 10rem; 
+      }
+      .card-container{
+        transform: skew(0.1deg,0.1deg);
+      }
+      
+      
+      button {
+        font-size: 1.25em;
+        border: none;
+        color: var(--white);
+        background-color: var(--grey);
+        padding: 0.75em 1.25em;
+        border-radius: 1.75em;
+        box-shadow: 0 0.1em 0.5em oklch(0% 0 0 / 0.333);
+        cursor: pointer;
+      }
+      
+      button:hover,
+      button:focus {
+        color: var(--grey);
+        background-color: var(--white);
+      }
+      
+      button:active { box-shadow: none; }
+      .picture{
+        height: 7rem;
+      }
+      .flag{
+        height: 0.6rem;
+        top: 0.1rem
+      }
+      .title{
+        font-size: 0.5rem;
+        display: flex;
+        flex-direction: row;
+        padding: 0.5rem;
+        align-items: center;
+      }
+      /*我的地方*/
+
+      /*翻面的時候還可以透光後面*/
+      .card .face { 
+        opacity: 100%;
+        backface-visibility: visible; 
+      }
+
+
+      .h{
+        display: flex;
+        flex-direction: row;
+      }
+      .v{
+        flex-direction: column;
+      }
+
+      .shadow {
+        position: absolute;
+        top:4%;
+        left:4%;
+        background-color: rgba(0, 0, 0, 0.2);
+        filter: blur(12px);
+        pointer-events: none; /* 確保陰影不影響卡片的操作 */
+        z-index: -1; /* 放置於卡片下方 */
+      }
+/*RWD*/
+.nfc-container {
+  position: relative;
+  width: 150px;
+  height: 150px;
+}
+
+.phone {
+  width: 50px;
+  height: 80px;
+  background-color: #333;
+  border-radius: 10px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.wave {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150px;
+  height: 150px;
+  background-color: rgba(0, 123, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulse 1.5s infinite;
+}
+.id-card{
+  justify-items: center;
+  padding: 1rem;
+}
+.text {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 18px;
+  color: #555;
+}
+.name-section .value{ /*姓名顯示大小*/
+  font-size: 1rem;
+}
+.label{
+  font-size: 0.5rem;/*項目顯示大小*/
+}
+.value{
+  font-size: 0.7rem;/*詳細資訊顯示大小*/
+}
+
+@keyframes pulse {
+  0% {
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0.8;
+  }
+  100% {
+      transform: translate(-50%, -50%) scale(1.5);
+      opacity: 0;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .card{
+    font-size: 0.6rem;
+  }
+}
+        .fail-icon {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background-color: rgba(255, 0, 0, 0.8);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+        }
+
+        .fail-icon span {
+            font-size: 50px;
+            color: white;
+            font-weight: bold;
+        }
+
+      /* 新增導航欄樣式 */
+      .navbar {
+        background-color: #333;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+
+      .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .nav-logo {
+        color: white;
+        font-size: 1.5rem;
+        text-decoration: none;
+        font-weight: bold;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 2rem;
+      }
+
+      .nav-links a {
+        color: white;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+      }
+
+      .nav-links a:hover {
+        background-color: #555;
+      }
+      footer {
+            background-color: #333;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+      /* 響應式設計 */
+      @media (max-width: 768px) {
+        .nav-container {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .nav-links {
+          flex-direction: row;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.9rem;
+      }
+      }
+
+    </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+        <a href="#" class="nav-logo">數位身分證系統</a>
+        <div class="nav-links">
+          <a href="home.html">首頁</a>
+          <a href="dID.html">感應卡片</a>
+          <a href="issue.html">憑證生成</a>
+          <a href="blockscan.html">區塊鏈</a>
+      </div>
+    </div>
+  </nav>
+  <article id="demo" class="flip-demo perspective-container">
+    <h2>身分證讀卡</h2>
+    <div class="card-container">
+      
+      <div class="card card-size card-animation">
+        <section class="front face" aria-hidden="false"></section>
+        <section class="back face" aria-hidden="true"></section>
+        <div class="top-right corner">
+          <div style="--i: 0;"></div>
+          <div style="--i: 1;"></div>
+          <div style="--i: 2;"></div>
+        </div>
+        <div class="bottom-right corner">
+          <div style="--i: 0;"></div>
+          <div style="--i: 1;"></div>
+          <div style="--i: 2;"></div>
+        </div>
+        <div class="bottom-left corner">
+          <div style="--i: 0;"></div>
+          <div style="--i: 1;"></div>
+          <div style="--i: 2;"></div>
+        </div>
+        <div class="top-left corner">
+          <div style="--i: 0;"></div>
+          <div style="--i: 1;"></div>
+          <div style="--i: 2;"></div>
+        </div>
+    
+        <div class="top edge"></div>
+        <div class="right edge"></div>
+        <div class="bottom edge"></div>
+        <div class="left edge"></div>
+      </div>
+      <div class="shadow card-size card-animation"></div>
+
+  </article>
+  <footer>
+    <p>&copy; 2024 數位身分證系統. demo重現</p>
+  </footer>
+  <script src="dID.js"></script>
+
+</body>
+</html>

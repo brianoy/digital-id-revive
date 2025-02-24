@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 區塊鏈瀏覽器</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        body {
+            background-color: #DCDCDC;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .navbar {
+            background-color: #333;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            color: white;
+            font-size: 1.5rem;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: #555;
+        }
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                flex-direction: row;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">區塊鏈瀏覽器</a>
+            <div class="nav-links">
+                <a href="home.html">首頁</a>
+                <a href="dID.html">感應卡片</a>
+                <a href="issue.html">憑證生成</a>
+                <a href="blockscan.html">區塊鏈</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-4">
+        <!-- 統計資訊 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <h3 class="text-gray-500 text-sm mb-1 flex items-center">
+                    ⏱️ 下一區塊倒數
+                </h3>
+                <p class="text-3xl font-bold text-indigo-600" id="countdown">5秒</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <h3 class="text-gray-500 text-sm mb-1 flex items-center">
+                    🔗 總區塊數
+                </h3>
+                <p class="text-3xl font-bold text-indigo-600" id="totalBlocks">-</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <h3 class="text-gray-500 text-sm mb-1 flex items-center">
+                    📜 待處理憑證
+                </h3>
+                <p class="text-3xl font-bold text-indigo-600" id="pendingCerts">-</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <h3 class="text-gray-500 text-sm mb-1 flex items-center">
+                    👥 活躍節點
+                </h3>
+                <p class="text-3xl font-bold text-indigo-600" id="activeNodes">-</p>
+            </div>
+        </div>
+
+        <!-- 搜尋區域 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm">
+                <h3 class="font-bold mb-3 flex items-center">
+                    🔍 搜尋區塊
+                </h3>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input type="text" id="blockSearch" placeholder="輸入區塊編號" 
+                           class="w-full sm:flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <button onclick="searchBlock()" 
+                            class="w-full sm:w-auto bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
+                        搜尋
+                    </button>
+                </div>
+                <div id="blockResult" class="mt-4 break-all"></div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm">
+                <h3 class="font-bold mb-3 flex items-center">
+                    🔍 搜尋憑證
+                </h3>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input type="text" id="certSearch" placeholder="輸入憑證ID" 
+                           class="w-full sm:flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <button onclick="searchCertificate()" 
+                            class="w-full sm:w-auto bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
+                        搜尋
+                    </button>
+                </div>
+                <div id="certResult" class="mt-4 break-all"></div>
+            </div>
+        </div>
+
+        <!-- 最新區塊和圖表 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="bg-white p-6 rounded-xl shadow-sm">
+                <h3 class="font-bold mb-4 flex items-center">🔗 最新區塊</h3>
+                <div id="latestBlocks" class="space-y-2"></div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm">
+                <h3 class="font-bold mb-4 flex items-center">📊 每區塊憑證數量</h3>
+                <canvas id="blockChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 區塊詳情彈窗 -->
+        <div id="blockModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div class="bg-white rounded-xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold">🔗 區塊詳情</h3>
+                    <button onclick="closeBlockModal()" class="text-2xl">&times;</button>
+                </div>
+                <div id="blockModalContent" class="break-all"></div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2024 數位身分證系統. demo重現</p>
+    </footer>
+
+    <script>
+        let countdown = 5;
+        let blockChart;
+
+        async function fetchData() {
+            try {
+                const [statusRes, blocksRes, nodesRes] = await Promise.all([
+                    fetch('https://xxxxxxx.ngrok.app/api/blockchain/status'),
+                    fetch('https://xxxxxxx.ngrok.app/api/blockchain/blocks'),
+                    fetch('https://xxxxxxx.ngrok.app/node/list')
+                ]);
+
+                const status = await statusRes.json();
+                const blocks = await blocksRes.json();
+                const nodes = await nodesRes.json();
+
+                updateDashboard(status, blocks, nodes);
+            } catch (error) {
+                console.error('錯誤:', error);
+            }
+        }
+
+        function updateDashboard(status, blocksData, nodes) {
+            document.getElementById('totalBlocks').textContent = status.total_blocks;
+            document.getElementById('pendingCerts').textContent = status.pending_certificates;
+            document.getElementById('activeNodes').textContent = Object.keys(nodes.nodes || {}).length;
+
+            const blocksHtml = blocksData.blocks.map(block => `
+                <div class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer" 
+                     onclick="showBlockDetails(${block.id})">
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium text-indigo-600">區塊 #${block.id}</span>
+                        <span class="text-sm text-gray-600">
+                            ${new Date(block.timestamp * 1000).toLocaleString()}
+                        </span>
+                    </div>
+                    <div class="text-sm text-gray-600 mt-1 break-all">
+                        雜湊值: ${block.hash.substring(0, 16)}...
+                    </div>
+                    <div class="text-sm mt-1">
+                        📜 ${block.certificates} 個憑證
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('latestBlocks').innerHTML = blocksHtml;
+
+            updateChart(blocksData.blocks);
+        }
+
+        function updateChart(blocks) {
+            const ctx = document.getElementById('blockChart');
+            if (blockChart) {
+                blockChart.destroy();
+            }
+            blockChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: blocks.map(b => `區塊 ${b.id}`),
+                    datasets: [{
+                        label: '憑證數量',
+                        data: blocks.map(b => b.certificates),
+                        backgroundColor: '#4f46e5'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        async function showBlockDetails(blockId) {
+            try {
+                const response = await fetch(`https://xxxxxxx.ngrok.app/api/block/${blockId}`);
+                const data = await response.json();
+                
+                const certificatesHtml = data.certificates.map(cert => `
+                    <div class="bg-gray-50 p-4 rounded-lg mb-2">
+                        <p class="font-medium">📄 憑證ID: <span class="text-indigo-600 break-all">${cert.id}</span></p>
+                        <p>👤 持有者: ${cert.holder}</p>
+                        <p>📋 類型: ${cert.type}</p>
+                        <p>✍️ 發行者: ${cert.issuer}</p>
+                        <p>📅 發行日期: ${new Date(cert.issue_date).toLocaleString()}</p>
+                        <p>⏳ 到期日期: ${new Date(cert.expiry_date).toLocaleString()}</p>
+                        <p>📝 元數據: ${JSON.stringify(cert.metadata)}</p>
+                    </div>
+                `).join('');
+
+                document.getElementById('blockModalContent').innerHTML = `
+                    <div class="space-y-4">
+                        <div class="border-b pb-4">
+                            <p class="text-xl font-bold text-indigo-600">區塊 #${data.index}</p>
+                            <p class="text-sm mt-2"><strong>雜湊值:</strong> 
+                                <span class="break-all">${data.hash}</span>
+                            </p>
+                            <p class="text-sm mt-2"><strong>前一區塊雜湊值:</strong> 
+                                <span class="break-all">${data.previous_hash}</span>
+                            </p>
+                            <p class="text-sm mt-2"><strong>時間戳記:</strong> 
+                                ${new Date(data.timestamp * 1000).toLocaleString()}
+                            </p>
+                            <p class="text-sm mt-2"><strong>確認者:</strong> ${data.confirmations.join(', ')}</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold mb-3">📜 此區塊中的憑證 (${data.certificates.length})</h4>
+                            ${certificatesHtml}
+                        </div>
+                    </div>
+                `;
+                document.getElementById('blockModal').classList.remove('hidden');
+            } catch (error) {
+                alert('載入區塊詳情時發生錯誤');
+            }
+        }
+
+        function closeBlockModal() {
+            document.getElementById('blockModal').classList.add('hidden');
+        }
+
+        async function searchBlock() {
+            const blockId = document.getElementById('blockSearch').value;
+            try {
+                const response = await fetch(`https://xxxxxxx.ngrok.app/api/block/${blockId}`);
+                const data = await response.json();
+                const html = `
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="font-medium text-indigo-600">區塊 #${data.index}</p>
+                        <p class="text-sm mt-1 break-all">雜湊值: ${data.hash}</p>
+                        <p class="text-sm break-all">前一區塊雜湊值: ${data.previous_hash}</p>
+                        <p class="text-sm">時間: ${new Date(data.timestamp * 1000).toLocaleString()}</p>
+                        <p class="text-sm">📜 憑證數量: ${data.certificates.length}</p>
+                        <p class="text-sm">✅ 確認者: ${data.confirmations.join(', ')}</p>
+                    </div>
+                `;
+                document.getElementById('blockResult').innerHTML = html;
+            } catch (error) {
+                document.getElementById('blockResult').innerHTML = 
+                    '<p class="text-red-500">❌ 找不到區塊</p>';
+            }
+        }
+
+        async function searchCertificate() {
+            const certId = document.getElementById('certSearch').value;
+            try {
+                const response = await fetch(`https://xxxxxxx.ngrok.app/api/certificate/${certId}`);
+                const data = await response.json();
+                const html = `
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p><strong>📄 憑證ID:</strong> <span class="break-all">${data.certificate.id}</span></p>
+                        <p><strong>👤 持有者:</strong> ${data.certificate.holder}</p>
+                        <p><strong>📋 類型:</strong> ${data.certificate.type}</p>
+                        <p><strong>🔗 所在區塊:</strong> ${data.block}</p>
+                        <p><strong>✍️ 發行者:</strong> ${data.issuer}</p>
+                        <p><strong>📑 持有者的其他憑證:</strong></p>
+                        <div class="pl-4 break-all">
+                            ${data.other_holder_certificates.length ? 
+                                data.other_holder_certificates.join(',<br>') : '無'}
+                        </div>
+                    </div>
+                `;
+                document.getElementById('certResult').innerHTML = html;
+            } catch (error) {
+                document.getElementById('certResult').innerHTML = 
+                    '<p class="text-red-500">❌ 找不到憑證</p>';
+            }
+        }
+
+        setInterval(() => {
+            countdown--;
+            if (countdown <= 0) {
+                countdown = 5;
+                fetchData();
+            }
+            document.getElementById('countdown').textContent = countdown + '秒';
+        }, 1000);
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('blockModal');
+            if (event.target == modal) {
+                closeBlockModal();
+            }
+        }
+
+        fetchData();
+    </script>
+</body>
+</html>

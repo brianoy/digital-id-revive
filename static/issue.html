@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>數位憑證申請系統</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/forge/1.3.1/forge.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --success-color: #22c55e;
+            --error-color: #ef4444;
+            --border-radius: 12px;
+        }
+
+        body {
+            background-color: #DCDCDC;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 50vw;
+            padding: 3rem;
+            margin-bottom: 10rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            width: 45vw;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #334155;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .status {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .status.success {
+            background-color: #f0fdf4;
+            color: var(--success-color);
+            border: 1px solid #dcfce7;
+            display: block;
+        }
+
+        .status.error {
+            background-color: #fef2f2;
+            color: var(--error-color);
+            border: 1px solid #fee2e2;
+            display: block;
+        }
+
+        .nfc-animation {
+            text-align: center;
+            margin: 2rem 0;
+            display: none;
+        }
+
+        .nfc-animation.active {
+            display: block;
+        }
+
+        .nfc-icon {
+            font-size: 3rem;
+            animation: pulse 2s infinite;
+        }
+
+        .navbar {
+            background-color: #333;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            color: white;
+            font-size: 1.5rem;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: #555;
+        }
+
+        .outter-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                flex-direction: row;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        
+        .status {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+
+        .status.success {
+            background-color: #f0fdf4;
+            color: var(--success-color);
+            border: 1px solid #dcfce7;
+            display: block;
+        }
+
+        .status.error {
+            background-color: #fef2f2;
+            color: var(--error-color);
+            border: 1px solid #fee2e2;
+            display: block;
+        }
+
+        .cert-id {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .cert-id:hover {
+            background-color: #f1f5f9;
+        }
+
+        .cert-id .copy-icon {
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">數位身分證系統</a>
+            <div class="nav-links">
+                <a href="home.html">首頁</a>
+                <a href="dID.html">感應卡片</a>
+                <a href="issue.html">憑證生成</a>
+                <a href="blockscan.html">區塊鏈</a>
+            </div>
+        </div>
+    </nav>
+    <div class="outter-container">
+        <h2>數位憑證申請</h2>
+        <div class="container">
+            <div class="form-group">
+                <label for="type">申請權限</label>
+                <select id="type" required>
+                    <option value="">請選擇申請權限</option>
+                    <option value="LEVEL1">第一權限</option>
+                    <option value="LEVEL2">第二權限</option>
+                    <option value="LEVEL3">第三權限</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="password">解密密碼</label>
+                <input type="password" id="password" placeholder="請輸入解密密碼" required>
+            </div>
+
+            <button id="startButton">開始申請</button>
+
+            <div class="nfc-animation" id="nfcAnimation">
+                <div class="nfc-icon">📱</div>
+                <p>請將卡片靠近手機感應區</p>
+            </div>
+
+            <div class="status" id="status"></div>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2024 數位身分證系統. demo重現</p>
+    </footer>
+    <script>
+        const startButton = document.getElementById('startButton');
+        const nfcAnimation = document.getElementById('nfcAnimation');
+        const status = document.getElementById('status');
+        let ndef = null;
+
+        // Generate RSA key pair from password
+        function generateRSAKey(password) {
+            function hashPassword(password) {
+                const md = forge.md.sha256.create();
+                md.update(password);
+                return md.digest().toHex();
+            }
+            
+            const hashedPassword = hashPassword(password);
+            const seed = forge.util.hexToBytes(hashedPassword);
+            const prng = forge.random.createInstance();
+            prng.seedFileSync = () => seed;
+            
+            const keypair = forge.pki.rsa.generateKeyPair({
+                bits: 512,
+                e: 0x10001,
+                prng: prng
+            });
+            
+            return keypair;
+        }
+
+        // Decrypt function using RSA
+        async function decryptWithRSA(encryptedData, password) {
+            try {
+                const keypair = generateRSAKey(password);
+                const decrypted = forge.util.decode64(
+                    keypair.privateKey.decrypt(
+                        forge.util.decode64(encryptedData),
+                        "RSA-OAEP"
+                    )
+                );
+                return decrypted;
+            } catch (error) {
+                throw new Error('解密失敗，密碼錯誤');
+            }
+        }
+
+        // 讀取 NFC 資料處理
+        async function read_data_pros(message) {
+            try {
+                const decoder = new TextDecoder();
+                for (const record of message.records) {
+                    const text = decoder.decode(record.data);
+                    const json_read = JSON.parse(text);
+                    await update_data(json_read);
+                    break; // 只處理第一條記錄
+                }
+            } catch (e) {
+                read_fail();
+            }
+        }
+
+        // 更新資料處理
+        async function update_data(json_read) {
+            try {
+                const password = document.getElementById('password').value;
+                const decryptedCert = await decryptWithRSA(json_read.certificate, password);
+                
+                const response = await fetch('/certificate/issue', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        holder: decryptedCert,
+                        type: document.getElementById('type').value,
+                        metadata: {
+                            vehicle_class: 'Type 2',
+                            restrictions: 'None'
+                        },
+                        expiry_days: 365
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('申請失敗');
+                }
+                const data = await response.json();
+                showStatus('憑證申請成功！' + data.cert_id, 'success', data.cert_id);
+                
+                // 重置 NFC 掃描器
+                resetNFCScanner();
+            } catch (error) {
+                showStatus(error.message, 'error');
+            }
+        }
+
+        // 讀取失敗處理
+        function read_fail() {
+            console.log("有可能是json物件產生失敗");
+            showStatus('卡片錯誤', 'error');
+            resetNFCScanner();
+        }
+
+
+        // 重置 NFC 掃描器
+        async function resetNFCScanner() {
+            if (ndef) {
+                try {
+                    // 清除所有事件監聽器
+                    ndef.onreading = null;
+                    ndef.onreadingerror = null;
+                    
+                    // 如果瀏覽器支援，中止當前的掃描
+                    if (ndef.abort) {
+                        await ndef.abort();
+                    }
+                    
+                    // 將 ndef 物件設為 null
+                    ndef = null;
+                } catch (error) {
+                    console.error('重置 NFC 掃描器時發生錯誤：', error);
+                }
+            }
+        }
+
+        // 顯示狀態訊息
+        function showStatus(message, type, certId = '') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `status ${type}`;
+            
+            if (type === 'success' && certId) {
+                // 分開顯示成功訊息和憑證ID
+                statusDiv.innerHTML = `
+                    <div>${message.split('！')[0]}！</div>
+                    <div class="cert-id" title="${certId}">
+                        <span class="copy-icon">📋</span>
+                        <span>${certId.slice(0, 10)}...</span>
+                    </div>
+                `;
+                
+                // 為憑證ID添加點擊事件
+                const certIdDiv = statusDiv.querySelector('.cert-id');
+                certIdDiv.onclick = async () => {
+                    try {
+                        await navigator.clipboard.writeText(certId);
+                        const originalHtml = certIdDiv.innerHTML;
+                        certIdDiv.innerHTML = '<span class="copy-icon">✅</span><span>已複製！</span>';
+                        setTimeout(() => {
+                            certIdDiv.innerHTML = originalHtml;
+                        }, 1500);
+                    } catch (err) {
+                        console.error('複製失敗：', err);
+                    }
+                };
+            } else {
+                statusDiv.textContent = message;
+            }
+            
+            nfcAnimation.classList.remove('active');
+        }
+
+        // 啟動 NFC 掃描
+        async function startNFCScan() {
+            try {
+                if (!('NDEFReader' in window)) {
+                    throw new Error('此瀏覽器不支援 NFC 功能');
+                }
+                
+                // 確保先重置現有的 NFC 掃描器
+                await resetNFCScanner();
+                
+                // 創建新的 NDEFReader 實例
+                ndef = new NDEFReader();
+                
+                try {
+                    await ndef.scan();
+                    
+                    // 使用 onreading 替代 addEventListener
+                    ndef.onreading = ({ message }) => {
+                        read_data_pros(message);
+                    };
+                    
+                    ndef.onreadingerror = (error) => {
+                        console.error('NFC 讀取錯誤：', error);
+                        read_fail();
+                    };
+                    
+                    nfcAnimation.classList.add('active');
+                    status.className = 'status';
+                } catch (err) {
+                    if (err.name === 'NotAllowedError') {
+                        throw new Error('您已拒絕 NFC 權限，請在設定內手動開啟');
+                    }
+                    if (err.name === 'InvalidStateError') {
+                        return;
+                    }
+                    console.error(err.name);
+                    throw err;
+                }
+            } catch (error) {
+                showStatus(error.message, 'error');
+            }
+        }
+
+        // 註冊按鈕事件
+        startButton.addEventListener('click', async () => {
+            const type = document.getElementById('type').value;
+            const password = document.getElementById('password').value;
+
+            if (!type || !password) {
+                showStatus('請填寫所有欄位', 'error');
+                return;
+            }
+
+            await startNFCScan();
+        });
+    </script>
+</body>
+</html>

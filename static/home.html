@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>數位身分證 - 新世代身分驗證系統</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            word-wrap: break-word;
+        }
+
+        :root {
+            --primary: #4795d8;
+            --primary-dark: #00d1dc;
+            --secondary: #00be33;
+            --dark: #333;
+            --light: #f8f9fa;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: var(--light);
+            overflow-x: hidden;
+        }
+
+        /* 導航欄 */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .nav-logo {
+            color: var(--primary-dark);
+            font-size: 1.25rem;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--dark);
+            text-decoration: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        /* 英雄區塊 */
+        .hero {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('demobottom.jpg') center/cover;/*封面要記得換*/
+            opacity: 0.1;
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 800px;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            animation: fadeInDown 1s ease;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        /* 層級系統動畫 */
+        .layers-system {
+            position: relative;
+            padding: 6rem 0;
+            background: var(--light);
+            overflow: hidden;
+        }
+
+        .layer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            perspective: 1000px;
+        }
+
+        .layer {
+            position: relative;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .layer.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .layer-title {
+            text-align: center;
+            margin-bottom: 0rem;
+            color: var(--primary);
+            font-size: 2rem;
+        }
+
+        /* 區塊鏈視覺化 */
+        .blockchain {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            padding: 2rem 0;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .block {
+            min-width: 150px;
+            height: 150px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            animation: blockFloat 3s infinite ease-in-out;
+        }
+
+        .block::after {
+            content: '';
+            position: absolute;
+            right: -2rem;
+            top: 50%;
+            width: 2rem;
+            height: 4px;
+            background: repeating-linear-gradient(
+                to right,
+                var(--primary-dark) 0,
+                var(--primary-dark) 5px,
+                transparent 5px,
+                transparent 10px
+            );
+            animation: connectBlocks 1.5s infinite linear;
+            background-size: 20px 100%;
+        }
+
+        @keyframes connectBlocks {
+            0% {
+                background-position: -20px 0;
+            }
+            100% {
+                background-position: 0 0;
+            }
+        }
+
+        .block:last-child::after {
+            display: none;
+        }
+
+        @keyframes blockFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+
+
+        /* Layer 2 應用層視覺化 */
+        .app-layer {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .app-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            transform: translateY(30px);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        .app-card.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* 特點區塊 */
+        .features {
+            padding: 4rem 1rem;
+        }
+
+        .features-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            padding: 2rem;
+            border-radius: 12px;
+            background: var(--light);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* 按鈕樣式 */
+        .btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .blockchain {
+                padding: 0rem;
+                overflow-x: auto;
+                justify-content: left;
+                display: flex;
+                align-items: center;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                padding: 2rem 0;
+                gap: 2rem;
+                margin: 2rem 0;
+            }
+
+            .block {
+                min-width: 100px;
+                height: 100px;
+            }
+
+            .feature-card:hover {
+                transform: none;
+            }
+
+            .nav-links {
+                gap: 0.5rem;
+                padding-left: 0.5rem;
+                font-size: 0.9rem;
+            }
+            .nav-container{
+                padding-left: 0.1rem
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .layer-container {
+                padding: 0 2rem;
+            }
+        }
+
+        /* 滾動條美化 */
+        .blockchain::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .blockchain::-webkit-scrollbar-track {
+            background: var(--light);
+        }
+
+        .blockchain::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">數位身分證</div>
+            <div class="nav-links">
+                <a href="home.html">首頁</a>
+                <a href="dID.html">感應卡片</a>
+                <a href="issue.html">憑證生成</a>
+                <a href="blockscan.html">區塊鏈</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>數位身分驗證</h1>
+            <p>快速、安全、方便的身分驗證</p>
+            <a href="dID.html" class="btn">立即體驗</a>
+        </div>
+    </section>
+
+    <div class="layers-system">
+        <div class="layer-container">
+            <div class="layer" id="layer1">
+                <h2 class="layer-title">Layer 1：身分驗證層</h2>
+                <div class="blockchain">
+                    <div class="block">
+                        <div style="font-size: 2rem;">📦</div>
+                        <div>Block #1</div>
+                        <small>驗證節點</small>
+                    </div>
+                    <div class="block">
+                        <div style="font-size: 2rem;">📦</div>
+                        <div>Block #2</div>
+                        <small>驗證節點</small>
+                    </div>
+                    <div class="block">
+                        <div style="font-size: 2rem;">📦</div>
+                        <div>Block #3</div>
+                        <small>驗證節點</small>
+                    </div>
+                    <div class="block">
+                        <div style="font-size: 2rem;">📦</div>
+                        <div>Block #4</div>
+                        <small>驗證節點</small>
+                    </div>
+                    <div class="block">
+                        <div style="font-size: 2rem;">📦</div>
+                        <div>Block #n</div>
+                        <small>...</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layer" id="layer2">
+                <h2 class="layer-title">Layer 2：應用服務層</h2>
+                <div class="app-layer">
+                    <div class="app-card">
+                        <div style="font-size: 2rem;">🏛️</div>
+                        <h3>政府服務</h3>
+                        <p>電子政務、線上投票</p>
+                    </div>
+                    <div class="app-card">
+                        <div style="font-size: 2rem;">🏥</div>
+                        <h3>醫療服務</h3>
+                        <p>就醫紀錄、處方簽發</p>
+                    </div>
+                    <div class="app-card">
+                        <div style="font-size: 2rem;">💳</div>
+                        <h3>金融服務</h3>
+                        <p>開戶認證、交易驗證</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="features">
+        <div class="features-container">
+            <div class="feature-card">
+                <div style="font-size: 2rem; text-align: center;">🔒</div>
+                <h3>安全防護</h3>
+                <p>採用先進的加密技術，確保您的個人資料安全無虞。通過區塊鏈技術實現去中心化驗證，杜絕資料竄改風險。</p>
+            </div>
+            <div class="feature-card">
+                <div style="font-size: 2rem; text-align: center;">⚡</div>
+                <h3>快速驗證</h3>
+                <p>只需輕觸感應，即可完成身分驗證，省時又方便。支援離線驗證，無需網路即可使用。</p>
+            </div>
+            <div class="feature-card">
+                <div style="font-size: 2rem; text-align: center;">🌐</div>
+                <h3>廣泛應用</h3>
+                <p>適用於政府機關、醫療機構、金融服務等多種場景。統一的身分驗證標準，一證通行。</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // 視窗滾動監測
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { 
+            threshold: 0.1,
+            rootMargin: '0px 0px -10% 0px'
+        });
+
+        // 註冊需要動畫的元素
+        document.querySelectorAll('.layer, .app-card').forEach(el => {
+            observer.observe(el);
+        });
+
+        // 檢測設備類型
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        
+        // 根據設備類型調整互動行為
+        if (isMobile) {
+            document.querySelectorAll('.feature-card').forEach(card => {
+                card.addEventListener('touchstart', () => {
+                    card.style.transform = 'scale(0.98)';
+                });
+                card.addEventListener('touchend', () => {
+                    card.style.transform = 'none';
+                });
+            });
+        }
+    </script>
+</body>
+</html>
