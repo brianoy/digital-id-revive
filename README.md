@@ -4,6 +4,16 @@ code by claude and gpt
 
 這才弄兩個禮拜就demo，請OOP魔人手下留情
 
+![螢幕擷取畫面 2025-03-05 013720](https://github.com/user-attachments/assets/193c7535-1fa3-4234-9b66-554a234f4b8c)
+![螢幕擷取畫面 2025-03-05 013942](https://github.com/user-attachments/assets/14c32162-3924-459c-8db3-22afc1ca4bb3)
+![螢幕擷取畫面 2025-03-05 013800](https://github.com/user-attachments/assets/014b5603-1fa6-403e-a8ef-e5f8bd683082)
+![螢幕擷取畫面 2025-03-05 013753](https://github.com/user-attachments/assets/742f539b-ee5a-435c-8b1c-e016fa6c56fb)
+![螢幕擷取畫面 2025-03-05 013739](https://github.com/user-attachments/assets/e86e41be-1863-435b-8820-2f5b65138cb8)
+
+![螢幕擷取畫面 2025-03-05 013623](https://github.com/user-attachments/assets/1e1dd9e6-6ddc-4f58-9d4d-f545cf27a7bb)
+![螢幕擷取畫面 2025-03-05 013620](https://github.com/user-attachments/assets/07486dc7-1e64-4637-a9af-f5d7cb591efb)
+![螢幕擷取畫面 2025-03-05 013617](https://github.com/user-attachments/assets/3ef1a23b-5c93-49d0-9b7e-5f9523b91ab0)
+
 ## 設計理念
 
 原本的主軸是公鑰加密，後來延伸變成區塊鏈，覺得可以融合概念算成熟但石沉大海的——數位身分證。不過看完了新聞，一樣看不懂當初發生什麼事，扯的資安也不算是我現階段需要解決的問題，demo得出東西就好。架構上是半集權式的區塊鏈，不需要挖礦，也不會有gas問題、沒有token、只有憑證，固定n秒出塊一次，區塊是空的也照常出塊。主鏈是政府機關，其他驗證節點比較像是附和的角色。
@@ -117,7 +127,7 @@ HTML5、CSS3 (3D transformations)、Vanilla JavaScript、Web NFC API
 
 * LEVEL2：中等安全級別->像是申請戶口名簿
 
-* LEVEL3：較低安全級別->像是
+* LEVEL3：較低安全級別->像是實名制驗證
 
 ### 驗證節點等級
 
@@ -137,6 +147,13 @@ HTML5、CSS3 (3D transformations)、Vanilla JavaScript、Web NFC API
 * demo 時一次卡了9個節點，後來發現直接被自己的heart beat攻擊(?)到癱瘓，只開3個節點有效解決
 
 * CORS 問題，記得設定好
+
+
+## 使用
+
+1. 解壓縮 `python.7z` 此為可攜式python包
+2. `_set_pip.cmd`
+
 
 ## 後記
 
