@@ -20,7 +20,7 @@ code by claude and gpt
 
 ### 卡片
 
-將以下基本資料用純文字的方式寫入卡片內，picture原本應該要能做到可以掃描卡片就出現大頭貼，但是4k塞不下，所以只能寫檔名再叫前端去要圖片了。
+外觀不是重點，著重在感應的部分，將以下基本資料用純文字的方式寫入卡片內，picture原本應該要能做到可以掃描卡片就出現大頭貼，但是4k bytes塞不下，所以只能寫檔名在叫前端去要圖片了。
 
 ```json
 {
@@ -42,9 +42,40 @@ code by claude and gpt
 }
 ```
 
+certificate來自於前端的加密，內容是`card1`，密碼是`98765432`，使用固定種子，利用RSA具有隨機填充的特性
+
+```javascript
+function generateRSAKey(password) {
+    const hashedPassword = hashPassword(password);
+    const seed = forge.util.hexToBytes(hashedPassword);
+    const prng = forge.random.createInstance();
+    prng.seedFileSync = () => seed;
+    const keypair = forge.pki.rsa.generateKeyPair({
+        bits: 512,
+        e: 0x10001,
+        prng: prng
+    });
+    
+    return keypair;
+}
+```
+
 ## 軟體
 
+### 網路
+
 我使用的網路不能設定Port Forwarding或DMZ，所以買了ngrok域名作穿透，
+
+### 前端
+
+
+### 後端
+fastapi
+
+### 採坑
+
+#### onload不能自動要nfc權限
+大坑，試了好久，一定要跟element互動後才可以跳權限出來
 
 ## 後記
 
@@ -52,6 +83,8 @@ code by claude and gpt
 
 我: ...
 
+## 參考資料
+1. https://ws.moi.gov.tw/001/Upload/OldFile/news_file/New%20eID%20%E6%96%B0%E8%BA%AB%E5%88%86%E8%AD%98%E5%88%A5%E8%AD%89%E6%87%B6%E4%BA%BA%E5%8C%85%E7%B0%A1%E5%A0%B1%E5%85%A7%E5%AE%B9.pdf
 
 
 
