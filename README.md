@@ -48,7 +48,7 @@ code by claude and gpt
 
 ### 卡片
 
-卡面外觀不是重點，著重在感應的部分，將以下基本資料用純文字的方式寫入卡片內，picture原本應該要能做到可以掃描卡片就出現大頭貼，但是卡片只有4k bytes 塞不下，所以只能寫檔名在叫前端去要圖片了。
+卡面外觀不是重點，著重在感應的部分，將`示範卡片的內容`資料夾底下，相對的卡片json檔案以純文字的方式寫入卡片內，picture原本應該要能做到可以掃描卡片就出現大頭貼，但是卡片只有4k bytes 塞不下，所以只能寫檔名在叫前端去要圖片了。
 
 ```json
 {
@@ -69,6 +69,12 @@ code by claude and gpt
   "certificate": "hohLg4qHnFAvFT1k1FfeH642JaJ/dUs/RaU7jPex34Odfibhl1u8A5p/B01s1BpEfanrUjw37JR5fVKebpDG2g=="
 }
 ```
+|卡片號碼|密碼|內容|
+|:-:|:-:|:-:|
+|1|98765432|card1|
+|2|87654321|card2|
+|3|12345678|card3|
+|4|99999999|card4|
 
 certificate來自於前端的以下程式碼，內容是`card1`，密碼是`98765432`，使用固定種子，利用RSA具有隨機填充的特性，原本會做出每issue一次憑證就會重新生成並寫回卡片，這邊只有做到驗證而已，所以沒有真的寫回去。
 
@@ -89,6 +95,47 @@ function generateRSAKey(password) {
 ```
 
 ## 軟體
+### 目錄結構
+
+```
+.
+│  blockchain.py
+│  favicon.ico
+│  main.py
+│  validator_node.py
+│  _run_app.cmd
+│  _run_ngrok_app.cmd
+│  _run_sub_node_1_1.cmd
+│  _run_sub_node_1_2.cmd
+│  _run_sub_node_2_1.cmd
+│  _run_sub_node_2_2.cmd
+│  _run_sub_node_3_1.cmd
+│  _run_sub_node_3_2.cmd
+│  _set_ngrok.cmd
+│  _set_pip.cmd
+│
+├─python->python.7z解壓縮後的資料夾
+├─static
+│  │  blockscan.html
+│  │  demobottom.jpg
+│  │  dID.html
+│  │  dID.js
+│  │  flag.jpg
+│  │  home.html
+│  │  issue.html
+│  │  ngrok.exe
+│  │  _setngrok.cmd
+│  │  示範1.png
+│  │  示範2.png
+│  │  示範3.png
+│  └─ 示範4.png
+│
+└─示範卡片的內容
+        1.json
+        2.json
+        3.json
+        4.json
+```
 
 ### 前端
 
