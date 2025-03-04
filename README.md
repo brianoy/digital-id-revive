@@ -4,16 +4,6 @@ code by claude and gpt
 
 這才弄兩個禮拜就demo，請OOP魔人手下留情
 
-![螢幕擷取畫面 2025-03-05 013720](https://github.com/user-attachments/assets/193c7535-1fa3-4234-9b66-554a234f4b8c)
-![螢幕擷取畫面 2025-03-05 013942](https://github.com/user-attachments/assets/14c32162-3924-459c-8db3-22afc1ca4bb3)
-![螢幕擷取畫面 2025-03-05 013800](https://github.com/user-attachments/assets/014b5603-1fa6-403e-a8ef-e5f8bd683082)
-![螢幕擷取畫面 2025-03-05 013753](https://github.com/user-attachments/assets/742f539b-ee5a-435c-8b1c-e016fa6c56fb)
-![螢幕擷取畫面 2025-03-05 013739](https://github.com/user-attachments/assets/e86e41be-1863-435b-8820-2f5b65138cb8)
-
-![螢幕擷取畫面 2025-03-05 013623](https://github.com/user-attachments/assets/1e1dd9e6-6ddc-4f58-9d4d-f545cf27a7bb)
-![螢幕擷取畫面 2025-03-05 013620](https://github.com/user-attachments/assets/07486dc7-1e64-4637-a9af-f5d7cb591efb)
-![螢幕擷取畫面 2025-03-05 013617](https://github.com/user-attachments/assets/3ef1a23b-5c93-49d0-9b7e-5f9523b91ab0)
-
 ## 設計理念
 
 原本的主軸是公鑰加密，後來延伸變成區塊鏈，覺得可以融合概念算成熟但石沉大海的——數位身分證。不過看完了新聞，一樣看不懂當初發生什麼事，扯的資安也不算是我現階段需要解決的問題，demo得出東西就好。架構上是半集權式的區塊鏈，不需要挖礦，也不會有gas問題、沒有token、只有憑證，固定n秒出塊一次，區塊是空的也照常出塊。主鏈是政府機關，其他驗證節點比較像是附和的角色。
@@ -104,7 +94,15 @@ function generateRSAKey(password) {
 
 HTML5、CSS3 (3D transformations)、Vanilla JavaScript、Web NFC API
 
+| 圖片1 | 圖片2 | 圖片3 | 圖片4 |
+|---|---|---|---|
+| ![螢幕擷取畫面 2025-03-05 013720](https://github.com/user-attachments/assets/193c7535-1fa3-4234-9b66-554a234f4b8c) | ![螢幕擷取畫面 2025-03-05 013753](https://github.com/user-attachments/assets/742f539b-ee5a-435c-8b1c-e016fa6c56fb) | ![螢幕擷取畫面 2025-03-05 013800](https://github.com/user-attachments/assets/014b5603-1fa6-403e-a8ef-e5f8bd683082) | ![螢幕擷取畫面 2025-03-05 013739](https://github.com/user-attachments/assets/e86e41be-1863-435b-8820-2f5b65138cb8)|
+
 ### 後端
+
+| 圖片1 | 圖片2 | 圖片3 |
+|---|---|---|
+| ![螢幕擷取畫面 2025-03-05 013623](https://github.com/user-attachments/assets/1e1dd9e6-6ddc-4f58-9d4d-f545cf27a7bb) | ![螢幕擷取畫面 2025-03-05 013620](https://github.com/user-attachments/assets/07486dc7-1e64-4637-a9af-f5d7cb591efb) | ![螢幕擷取畫面 2025-03-05 013617](https://github.com/user-attachments/assets/3ef1a23b-5c93-49d0-9b7e-5f9523b91ab0) |
 
 我使用的網路不能設定Port Forwarding或DMZ，所以買了ngrok域名作穿透，域名應該會叫`https://xxx.ngrok.app/`。如果要在本地端測試，記得取代全部的網址為`http://127.0.0.1:8000`
 
@@ -137,9 +135,6 @@ HTML5、CSS3 (3D transformations)、Vanilla JavaScript、Web NFC API
 
 * LEVEL3_NODE：只能驗證第三級別的憑證->像是個人節點
 
-
-
-
 ## 採坑
 
 * onload不能自動要nfc權限，真的大坑，試了好久，一定要跟element互動後(像是click)才可以跳權限出來
@@ -151,9 +146,11 @@ HTML5、CSS3 (3D transformations)、Vanilla JavaScript、Web NFC API
 
 ## 使用
 
-1. 解壓縮 `python.7z` 此為可攜式python包
-2. `_set_pip.cmd`
-
+1. 解壓縮 `python.7z` 此為可攜式python包，依賴已經在裡面了，無須`pip install`
+2. 確保所有static底下的檔案的url都是正確的
+3. `_set_ngrok.cmd` 如果要使用ngrok映射，必須先下載[ngrok.exe](https://ngrok.com/downloads/windows?tab=download)，填上token後，cmd打上`"ngrok.exe" http --url=xxx.ngrok.app 8000`啟動ngrok app，用免費的臨時網址也可以喔
+4. `_run_app.cmd` 執行主區塊鏈
+5. `_run_sub_node_1_1.cmd` 執行驗證子節點，`1_1`代表第一級第一個節點
 
 ## 後記
 
@@ -165,7 +162,7 @@ HTML5、CSS3 (3D transformations)、Vanilla JavaScript、Web NFC API
 1. https://ws.moi.gov.tw/001/Upload/OldFile/news_file/New%20eID%20%E6%96%B0%E8%BA%AB%E5%88%86%E8%AD%98%E5%88%A5%E8%AD%89%E6%87%B6%E4%BA%BA%E5%8C%85%E7%B0%A1%E5%A0%B1%E5%85%A7%E5%AE%B9.pdf
 
 ## License
-GPL-3.0
+GPL-3.0 license.
 
 
 
