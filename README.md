@@ -182,7 +182,7 @@ HTML5、CSS3 (3D transformations)、Vanilla JavaScript、Web NFC API
 
 * LEVEL3_NODE：只能驗證第三級別的憑證->像是個人節點
 
-## 採坑
+## 踩坑
 
 * onload不能自動要nfc權限，真的大坑，試了好久，一定要跟element互動後(像是click)才可以跳權限出來
 
@@ -191,11 +191,11 @@ HTML5、CSS3 (3D transformations)、Vanilla JavaScript、Web NFC API
 * CORS 問題，記得設定好
 
 
-## 使用
+## 開始使用
 
 1. 解壓縮 `python.7z` 此為可攜式python包，依賴已經在裡面了，無須`pip install`
 2. 確保所有static底下的檔案的url都是正確的
-3. `_set_ngrok.cmd` 如果要使用ngrok映射，必須先下載[ngrok.exe](https://ngrok.com/downloads/windows?tab=download)，填上token後，cmd打上`"ngrok.exe" http --url=xxx.ngrok.app 8000`啟動ngrok app，用免費的臨時網址也可以喔
+3. `_set_ngrok.cmd` 如果要使用ngrok映射，必須先下載[ngrok.exe](https://ngrok.com/downloads/windows?tab=download)放在根目錄，填上token後，cmd打上`"ngrok.exe" http --url=xxx.ngrok.app 8000`啟動ngrok app，用免費的臨時網址也可以喔
 4. `_run_app.cmd` 執行主區塊鏈
 5. `_run_sub_node_1_1.cmd` 執行驗證子節點，`1_1`代表第一級第一個節點
 
