@@ -4,7 +4,7 @@ code by claude and gpt
 
 ## 設計理念
 
-原本的主題是公鑰加密，後來延伸變成區塊鏈，覺得可以融合概念算成熟，但石沉大海的數位身分證。不過看完了新聞，一樣看不懂當初發生什麼事，扯的資安也不算是我現階段需要解決的問題，demo得出東西就好。
+原本的主題是公鑰加密，後來延伸變成區塊鏈，覺得可以融合概念算成熟，但石沉大海的數位身分證。不過看完了新聞，一樣看不懂當初發生什麼事，扯的資安也不算是我現階段需要解決的問題，demo得出東西就好。算是半集權式的區塊鏈想法，不需要挖礦，也不會有gas問題，
 
 ## 硬體
 
@@ -62,15 +62,30 @@ function generateRSAKey(password) {
 
 ## 軟體
 
-### 網路
-
-我使用的網路不能設定Port Forwarding或DMZ，所以買了ngrok域名作穿透，
-
 ### 前端
 
+HTML5、CSS3 (3D transformations)、Vanilla JavaScript、Web NFC API
 
 ### 後端
-fastapi
+
+我使用的網路不能設定Port Forwarding或DMZ，所以買了ngrok域名作穿透，域名應該會叫`https://xxx.ngrok.io/`
+
+#### api實現
+
+fastapi、uvicorn
+
+### 憑證申請等級
+
+LEVEL1：最高安全級別
+LEVEL2：中等安全級別
+LEVEL3：較低安全級別
+
+### 驗證節點等級
+
+LEVEL1_NODE：可以驗證所有級別的證書->像是政府機關
+LEVEL2_NODE：可以驗證第二和第三級別的證書->像是民間機構
+LEVEL3_NODE：只能驗證第三級別的證書->像是個人節點
+
 
 ### 採坑
 
@@ -86,6 +101,8 @@ fastapi
 ## 參考資料
 1. https://ws.moi.gov.tw/001/Upload/OldFile/news_file/New%20eID%20%E6%96%B0%E8%BA%AB%E5%88%86%E8%AD%98%E5%88%A5%E8%AD%89%E6%87%B6%E4%BA%BA%E5%8C%85%E7%B0%A1%E5%A0%B1%E5%85%A7%E5%AE%B9.pdf
 
+## License
+GPL-3.0
 
 
 
