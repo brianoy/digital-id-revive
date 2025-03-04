@@ -106,20 +106,20 @@ HTML5、CSS3 (3D transformations)、Vanilla JavaScript、Web NFC API
 
 ### 後端
 
-我使用的網路不能設定Port Forwarding或DMZ，所以買了ngrok域名作穿透，域名應該會叫`https://xxx.ngrok.app/`，如果要使用我的程式碼在本地端測試記得取代全部的網址為`http://127.0.0.1:8000`
+我使用的網路不能設定Port Forwarding或DMZ，所以買了ngrok域名作穿透，域名應該會叫`https://xxx.ngrok.app/`。如果要在本地端測試，記得取代全部的網址為`http://127.0.0.1:8000`
 
 #### api實現
 
 使用fastapi、uvicorn套件
 
-|api接口|說明|回應格式
-|:-:|:-:|:-:|
-|`/certificate/issue`|發行新證書||
-|`/api/certificate/{cert_id}`|獲取證書詳情||
-|`/chain/status`|取得區塊鏈狀態||
-|`/node/register`|節點註冊||
-|`/message/poll`|抓取消息||
-|`/node/heartbeat`|確認節點上線狀態||
+|api接口|方式|說明|回應格式
+|:-:|:-:|:-:|:-:|
+|`/certificate/issue`|POST|發行新憑證|json|
+|`/api/certificate/{cert_id}`|GET|取得憑證資訊|json|
+|`/chain/status`|GET|取得區塊鏈狀態|json|
+|`/node/register`|POST|節點註冊|json|
+|`/message/poll`|GET|抓取消息|json|
+|`/node/heartbeat`|POST|確認節點上線狀態|json|
 
 ### 憑證申請等級
 
